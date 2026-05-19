@@ -1,0 +1,25 @@
+Name: Rahul Sharma
+Email: rahul@gmail.com
+Phone: 9876543210
+
+OBJECTIVE
+Experienced Python Django developer seeking backend role.
+
+EDUCATION
+B.Tech Computer Science — 2022
+CGPA: 8.2/10
+
+EXPERIENCE
+Software Developer — TCS — 2 years
+- Developed REST APIs using Python and Django
+- Managed SQL databases using PostgreSQL
+- Used Git for version control
+- Deployed applications using Docker
+
+SKILLS
+Python, Django, SQL, PostgreSQL, Git, Docker, REST API,
+JavaScript, HTML, CSS, Linux, AWS
+
+CERTIFICATIONS
+Python Certified Developer — 2022
+AWS Cloud Practitioner — 2023

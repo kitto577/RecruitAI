@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RecruitAI — Create Account</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cabinet+Grotesk:wght@300;400;500;700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#020408;--deep:#050d12;--glow1:#00f5d4;--glow2:#00c9a7;--bio1:#7affde;--amber:#ffb830;--rose:#ff4d7e;--text:#d4f0ec;--dim:#4a7a72;--panel:rgba(0,245,212,0.03);--border:rgba(0,245,212,0.12);--border2:rgba(0,245,212,0.25);}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--ink);color:var(--text);font-family:'Cabinet Grotesk',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;cursor:none;overflow-x:hidden;}
+.co{position:fixed;width:36px;height:36px;border:1.5px solid var(--glow1);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .3s,height .3s,border-color .3s;mix-blend-mode:screen;}
+.ci{position:fixed;width:6px;height:6px;background:var(--glow1);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);box-shadow:0 0 10px var(--glow1),0 0 20px var(--glow1);}
+.sea-bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 100% 80% at 50% 120%,#001a14 0%,var(--ink) 60%);}
+.bio-orb{position:absolute;border-radius:50%;filter:blur(80px);mix-blend-mode:screen;animation:orb-float ease-in-out infinite;}
+.o1{width:700px;height:700px;background:radial-gradient(circle,rgba(0,245,212,.12) 0%,transparent 70%);top:-300px;right:-200px;animation-duration:25s;}
+.o2{width:400px;height:400px;background:radial-gradient(circle,rgba(122,255,222,.09) 0%,transparent 70%);bottom:-200px;left:-100px;animation-duration:30s;animation-delay:-10s;}
+@keyframes orb-float{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(30px,-20px) scale(1.05)}}
+.scanlines{position:fixed;inset:0;z-index:1;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,245,212,.012) 3px,rgba(0,245,212,.012) 4px);}
+.pf{position:fixed;inset:0;z-index:0;pointer-events:none;}
+.p{position:absolute;border-radius:50%;animation:p-rise linear infinite;opacity:0;}
+@keyframes p-rise{0%{transform:translateY(0) translateX(0);opacity:0}10%{opacity:.9}90%{opacity:.2}100%{transform:translateY(-110vh) translateX(var(--d));opacity:0}}
+
+.wrap{position:relative;z-index:10;width:100%;max-width:560px;animation:fade-up .8s ease both;}
+
+/* Top bar */
+.top-bar{display:flex;align-items:center;margin-bottom:2.5rem;}
+.brand-link{display:flex;align-items:center;gap:.75rem;text-decoration:none;}
+.brand-hex{width:36px;height:36px;position:relative;display:flex;align-items:center;justify-content:center;}
+.brand-hex svg{position:absolute;inset:0;animation:hex-spin 8s linear infinite;}
+.brand-glyph{font-size:1rem;position:relative;z-index:1;}
+.brand-name{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.1em;color:var(--glow1);text-shadow:0 0 20px rgba(0,245,212,.5);}
+.back-link{margin-left:auto;font-size:.75rem;color:var(--dim);text-decoration:none;letter-spacing:.1em;text-transform:uppercase;transition:color .2s;}
+.back-link:hover{color:var(--glow1);}
+@keyframes hex-spin{to{transform:rotate(360deg)}}
+
+.panel{background:var(--panel);border:1px solid var(--border);padding:2.5rem;position:relative;overflow:hidden;}
+.panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--glow1),transparent);opacity:.7;}
+.corner{position:absolute;width:16px;height:16px;border-color:var(--glow2);border-style:solid;opacity:.4;}
+.c-tl{top:0;left:0;border-width:1px 0 0 1px}.c-tr{top:0;right:0;border-width:1px 1px 0 0}
+.c-bl{bottom:0;left:0;border-width:0 0 1px 1px}.c-br{bottom:0;right:0;border-width:0 1px 1px 0}
+
+.panel-title{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.05em;color:#fff;margin-bottom:.25rem;}
+.panel-sub{font-family:'Instrument Serif',serif;font-style:italic;font-size:.9rem;color:var(--dim);margin-bottom:2rem;}
+
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.field{margin-bottom:1.25rem;}
+.field-label{font-size:.62rem;font-weight:700;color:var(--dim);letter-spacing:.18em;text-transform:uppercase;display:block;margin-bottom:.5rem;}
+.field-wrap{position:relative;}
+.field-icon{position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--dim);font-size:.85rem;transition:color .3s;pointer-events:none;}
+input[type="text"],input[type="password"],input[type="email"]{
+  width:100%;background:rgba(0,245,212,.03);border:1px solid var(--border);
+  padding:.8rem 1rem .8rem 2.75rem;color:var(--text);
+  font-family:'Cabinet Grotesk',sans-serif;font-size:.9rem;outline:none;transition:all .3s;}
+input:focus{border-color:var(--glow2);background:rgba(0,245,212,.06);box-shadow:0 0 0 3px rgba(0,245,212,.08);}
+input:focus~.field-icon{color:var(--glow1);}
+input::placeholder{color:rgba(74,122,114,.5);}
+
+/* Role picker */
+.role-section{margin-bottom:1.5rem;}
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:.5rem;}
+.role-opt{position:relative;}
+.role-opt input[type="radio"]{position:absolute;opacity:0;pointer-events:none;}
+.role-card{
+  display:flex;flex-direction:column;align-items:center;gap:.5rem;
+  padding:1.25rem 1rem;border:1px solid var(--border);
+  background:rgba(0,245,212,.02);cursor:none;transition:all .25s;
+}
+.role-card:hover{border-color:var(--border2);background:rgba(0,245,212,.04);}
+.role-opt input:checked+.role-card{
+  border-color:var(--glow1);background:rgba(0,245,212,.08);
+  box-shadow:0 0 20px rgba(0,245,212,.15),inset 0 0 20px rgba(0,245,212,.04);
+}
+.role-icon{font-size:2rem;}
+.role-name{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.08em;color:#fff;}
+.role-desc{font-size:.7rem;color:var(--dim);text-align:center;line-height:1.4;}
+
+.btn-submit{width:100%;padding:1rem;position:relative;overflow:hidden;
+  background:transparent;border:1.5px solid var(--glow1);
+  color:var(--ink);font-family:'Bebas Neue',sans-serif;
+  font-size:1.1rem;letter-spacing:.15em;cursor:none;transition:all .4s;margin-top:.5rem;}
+.btn-submit::before{content:'';position:absolute;inset:0;background:var(--glow1);transform:translateY(100%);transition:transform .4s cubic-bezier(.16,1,.3,1);}
+.btn-submit span{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:.6rem;}
+.btn-submit:hover{box-shadow:0 0 40px rgba(0,245,212,.5);}
+.btn-submit:hover::before{transform:translateY(0);}
+
+.err{padding:.75rem 1rem;border:1px solid rgba(255,77,126,.3);background:rgba(255,77,126,.06);font-size:.82rem;color:#ff8fab;margin-bottom:1.5rem;}
+.login-link{text-align:center;margin-top:1.5rem;font-size:.82rem;color:var(--dim);}
+.login-link a{color:var(--glow1);text-decoration:none;font-weight:700;}
+.login-link a:hover{text-shadow:0 0 15px rgba(0,245,212,.6);}
+@keyframes fade-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="co" id="co"></div><div class="ci" id="ci"></div>
+<div class="sea-bg"><div class="bio-orb o1"></div><div class="bio-orb o2"></div></div>
+<div class="scanlines"></div>
+<div class="pf" id="pf"></div>
+
+<div class="wrap">
+  <div class="top-bar">
+    <a href="/login/" class="brand-link">
+      <div class="brand-hex">
+        <svg width="36" height="36" viewBox="0 0 36 36"><polygon points="18,2 33,10 33,26 18,34 3,26 3,10" fill="none" stroke="rgba(0,245,212,0.5)" stroke-width="1"/></svg>
+        <span class="brand-glyph">⬡</span>
+      </div>
+      <span class="brand-name">RecruitAI</span>
+    </a>
+    <a href="/login/" class="back-link">← Sign In</a>
+  </div>
+
+  <div class="panel">
+    <div class="corner c-tl"></div><div class="corner c-tr"></div>
+    <div class="corner c-bl"></div><div class="corner c-br"></div>
+    <div class="panel-title">Create Account</div>
+    <div class="panel-sub">Create your account to get started.</div>
+
+    {% if messages %}{% for msg in messages %}<div class="err">⚠ {{ msg }}</div>{% endfor %}{% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="row2">
+        <div class="field">
+          <label class="field-label">Username</label>
+          <div class="field-wrap">
+            <span class="field-icon">◈</span>
+            <input type="text" name="username" placeholder="johndoe" required>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Email</label>
+          <div class="field-wrap">
+            <span class="field-icon">@</span>
+            <input type="email" name="email" placeholder="you@email.com">
+          </div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label class="field-label">Password</label>
+          <div class="field-wrap">
+            <span class="field-icon">◉</span>
+            <input type="password" name="password1" placeholder="Min 8 chars + A-Z + 0-9 + !@#$" required minlength="8" id="pw1">
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Confirm</label>
+          <div class="field-wrap">
+            <span class="field-icon">◉</span>
+            <input type="password" name="password2" placeholder="Repeat password" required minlength="8" id="pw2">
+          </div>
+        </div>
+      </div>
+
+      <div class="role-section">
+        <div class="field-label">I am a...</div>
+        <div class="role-grid">
+          <label class="role-opt">
+            <input type="radio" name="role" value="candidate" checked>
+            <div class="role-card">
+              <div class="role-icon">👨‍🎓</div>
+              <div class="role-name">Candidate</div>
+              <div class="role-desc">Apply & see my AI match score</div>
+            </div>
+          </label>
+          <label class="role-opt">
+            <input type="radio" name="role" value="hr">
+            <div class="role-card">
+              <div class="role-icon">👩‍💼</div>
+              <div class="role-name">HR / Recruiter</div>
+              <div class="role-desc">Screen & rank candidates</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit"><span>⬡ Create Account</span></button>
+    </form>
+  </div>
+  <div class="login-link">Already have an account? <a href="/login/">Sign In →</a></div>
+</div>
+
+<script>
+const co=document.getElementById('co'),ci=document.getElementById('ci');
+let mx=-200,my=-200,ox=-200,oy=-200;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;ci.style.left=mx+'px';ci.style.top=my+'px';});
+(function loop(){ox+=(mx-ox)*.12;oy+=(my-oy)*.12;co.style.left=ox+'px';co.style.top=oy+'px';requestAnimationFrame(loop);})();
+document.querySelectorAll('a,button,input,label').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{co.style.width='56px';co.style.height='56px';co.style.borderColor='var(--bio1)';});
+  el.addEventListener('mouseleave',()=>{co.style.width='36px';co.style.height='36px';co.style.borderColor='var(--glow1)';});
+});
+const pf=document.getElementById('pf');
+for(let i=0;i<40;i++){const p=document.createElement('div');p.className='p';const s=1+Math.random()*2;
+  p.style.cssText=`left:${Math.random()*100}%;bottom:-5px;width:${s}px;height:${s}px;--d:${(Math.random()-.5)*80}px;animation-duration:${12+Math.random()*18}s;animation-delay:${-Math.random()*30}s;background:${Math.random()>.7?'var(--amber)':Math.random()>.5?'var(--bio1)':'var(--glow1)'};box-shadow:0 0 ${4+s*2}px currentColor;`;
+  pf.appendChild(p);}
+</script>
+</body>
+</html>

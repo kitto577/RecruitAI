@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RecruitAI — Score Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cabinet+Grotesk:wght@300;400;500;700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#020408;--glow1:#00f5d4;--glow2:#00c9a7;--bio1:#7affde;--amber:#ffb830;--rose:#ff4d7e;--lime:#b8ffb8;--text:#d4f0ec;--text2:#9abfb8;--dim:#4a7a72;--dimmer:#2a4a44;--border:rgba(0,245,212,0.1);--border2:rgba(0,245,212,0.25);}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--ink);color:var(--text);font-family:'Cabinet Grotesk',sans-serif;min-height:100vh;cursor:none;}
+.co{position:fixed;width:32px;height:32px;border:1.5px solid var(--glow1);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .25s,height .25s;mix-blend-mode:screen;}
+.ci{position:fixed;width:5px;height:5px;background:var(--glow1);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);box-shadow:0 0 8px var(--glow1),0 0 16px var(--glow1);}
+.sea-bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 60% 50% at 30% 30%,rgba(0,245,212,.08) 0%,transparent 60%),radial-gradient(ellipse 40% 40% at 80% 80%,rgba(0,245,212,.05) 0%,transparent 50%),var(--ink);}
+.scanlines{position:fixed;inset:0;z-index:1;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,245,212,.01) 3px,rgba(0,245,212,.01) 4px);}
+nav{position:sticky;top:0;z-index:50;background:rgba(2,4,8,.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:.9rem 3rem;display:flex;align-items:center;gap:1rem;}
+.nb{display:flex;align-items:center;gap:.75rem;text-decoration:none;}
+.nh{width:32px;height:32px;position:relative;display:flex;align-items:center;justify-content:center;}
+.nh svg{position:absolute;inset:0;animation:spin 10s linear infinite;}
+.ng{position:relative;z-index:1;}@keyframes spin{to{transform:rotate(360deg)}}
+.nn{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.1em;color:var(--glow1);text-shadow:0 0 20px rgba(0,245,212,.4);}
+.back{margin-left:auto;padding:.4rem .9rem;font-size:.72rem;font-weight:700;border:1px solid var(--border);color:var(--dim);text-decoration:none;transition:all .2s;letter-spacing:.08em;}
+.back:hover{color:var(--text);border-color:var(--border2);}
+.page{position:relative;z-index:5;max-width:1000px;margin:0 auto;padding:3rem 2rem;}
+.layout{display:grid;grid-template-columns:280px 1fr;gap:1.5px;background:var(--border);border:1px solid var(--border);}
+
+/* Score card */
+.score-card{background:var(--ink);padding:2rem;text-align:center;position:relative;overflow:hidden;}
+.score-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--glow1),transparent);opacity:.7;}
+.sc-job-lbl{font-size:.58rem;font-weight:700;color:var(--dimmer);letter-spacing:.18em;text-transform:uppercase;margin-bottom:.3rem;}
+.sc-job{font-weight:700;font-size:.9rem;margin-bottom:1.75rem;color:var(--text2);}
+.big-num{font-family:'Bebas Neue',sans-serif;font-size:7rem;line-height:1;letter-spacing:.02em;}
+.bh{color:var(--bio1);text-shadow:0 0 30px rgba(122,255,222,.4);}
+.bm{color:var(--glow1);text-shadow:0 0 30px rgba(0,245,212,.4);}
+.bl{color:var(--rose);text-shadow:0 0 30px rgba(255,77,126,.4);}
+.pct{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--dimmer);}
+.score-cap{font-family:'Instrument Serif',serif;font-style:italic;font-size:.85rem;color:var(--dim);margin-bottom:1.5rem;}
+.stat-b{display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .75rem;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border:1px solid;margin-bottom:1.75rem;}
+.s-shortlisted{background:rgba(184,255,184,.05);color:var(--lime);border-color:rgba(184,255,184,.2);}
+.s-pending{background:rgba(255,184,48,.05);color:var(--amber);border-color:rgba(255,184,48,.2);}
+.s-review{background:rgba(0,245,212,.05);color:var(--glow1);border-color:rgba(0,245,212,.2);}
+.s-rejected{background:rgba(255,77,126,.05);color:var(--rose);border-color:rgba(255,77,126,.2);}
+.sdot{width:4px;height:4px;border-radius:50%;background:currentColor;}
+.breakdown{text-align:left;}
+.bd-row{display:flex;align-items:center;gap:.6rem;margin-bottom:.6rem;}
+.bd-lbl{font-size:.62rem;font-weight:700;color:var(--dimmer);letter-spacing:.1em;text-transform:uppercase;width:80px;flex-shrink:0;}
+.bd-bar{flex:1;height:4px;background:rgba(0,245,212,.06);overflow:hidden;}
+.bd-fill{height:100%;animation:bar-in 1.5s ease both;}
+.fp{background:linear-gradient(90deg,var(--glow1),var(--bio1));}
+.fa{background:linear-gradient(90deg,var(--glow2),var(--glow1));}
+.bd-val{font-family:'Bebas Neue',sans-serif;font-size:.9rem;width:38px;text-align:right;color:var(--glow1);}
+@keyframes bar-in{from{width:0}}
+
+/* Right col */
+.right-col{display:flex;flex-direction:column;gap:1.5px;}
+.panel{background:var(--ink);padding:2rem;position:relative;overflow:hidden;}
+.panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,245,212,.3),transparent);}
+.p-lbl{font-size:.6rem;font-weight:700;color:var(--dimmer);letter-spacing:.18em;text-transform:uppercase;margin-bottom:.3rem;display:flex;align-items:center;gap:.4rem;}
+.p-lbl::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--glow1);box-shadow:0 0 5px var(--glow1);}
+.p-title{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.06em;color:#fff;margin-bottom:1rem;}
+.skills-wrap{display:flex;flex-wrap:wrap;gap:.35rem;}
+.skill{display:inline-flex;padding:.3rem .8rem;font-size:.72rem;font-weight:600;background:rgba(0,245,212,.05);color:var(--glow2);border:1px solid rgba(0,245,212,.12);transition:all .2s;cursor:none;}
+.skill:hover{background:rgba(0,245,212,.1);border-color:var(--border2);}
+.skill-miss{background:rgba(255,77,126,.05);color:var(--rose);border-color:rgba(255,77,126,.2);}
+.skill-miss:hover{background:rgba(255,77,126,.1);}
+.gap-tip{margin-top:1.25rem;padding:1rem 1.25rem;background:rgba(255,184,48,.03);border:1px solid rgba(255,184,48,.15);}
+.gt-lbl{font-size:.58rem;font-weight:700;color:var(--amber);letter-spacing:.18em;text-transform:uppercase;margin-bottom:.5rem;}
+.gt-txt{font-size:.78rem;color:var(--text2);line-height:1.7;}
+.gt-txt strong{color:var(--amber);}
+.no-gap{display:flex;align-items:center;gap:.75rem;padding:.9rem 1.1rem;background:rgba(122,255,222,.04);border:1px solid rgba(122,255,222,.15);font-size:.82rem;color:var(--bio1);}
+</style>
+</head>
+<body>
+<div class="co" id="co"></div><div class="ci" id="ci"></div>
+<div class="sea-bg"></div><div class="scanlines"></div>
+<nav>
+  <a href="/portal/" class="nb">
+    <div class="nh"><svg width="32" height="32" viewBox="0 0 32 32"><polygon points="16,2 29,9 29,23 16,30 3,23 3,9" fill="none" stroke="rgba(0,245,212,0.5)" stroke-width="1"/></svg><span class="ng">⬡</span></div>
+    <span class="nn">RecruitAI</span>
+  </a>
+  <a href="/portal/my-applications/" class="back">← My Applications</a>
+</nav>
+<div class="page">
+  <div class="layout">
+    <div class="score-card">
+      <div class="sc-job-lbl">Applied for</div>
+      <div class="sc-job">{{ candidate.job.title }}</div>
+      <div>
+        <span class="big-num {% if candidate.score_pct >= 75 %}bh{% elif candidate.score_pct >= 50 %}bm{% else %}bl{% endif %}">{{ candidate.score_pct }}</span><span class="pct">%</span>
+      </div>
+      <div class="score-cap">AI Match Score</div>
+      <div class="stat-b s-{{ candidate.status }}"><span class="sdot"></span>{{ candidate.get_status_display }}</div>
+      <div class="breakdown">
+        <div class="bd-row"><span class="bd-lbl">TF-IDF</span><div class="bd-bar"><div class="bd-fill fp" style="width:{{ candidate.tfidf_pct }}%"></div></div><span class="bd-val">{{ candidate.tfidf_pct|floatformat:0 }}%</span></div>
+        <div class="bd-row"><span class="bd-lbl">BERT AI</span><div class="bd-bar"><div class="bd-fill fa" style="width:{{ candidate.bert_pct }}%"></div></div><span class="bd-val">{{ candidate.bert_pct|floatformat:0 }}%</span></div>
+      </div>
+    </div>
+    <div class="right-col">
+      <div class="panel">
+        <div class="p-lbl">Detected Skills</div>
+        <div class="p-title">Your Strengths</div>
+        {% if candidate.skills %}<div class="skills-wrap">{% for s in candidate.skills %}<span class="skill">{{ s }}</span>{% endfor %}</div>
+        {% else %}<div style="font-size:.82rem;color:var(--dimmer)">No skills detected. HR will run AI screening soon.</div>{% endif %}
+      </div>
+      <div class="panel">
+        <div class="p-lbl" style="--dot:var(--rose)">Skill Gap Analysis</div>
+        <div class="p-title">Missing Skills</div>
+        {% if candidate.missing_skills %}
+        <div style="font-size:.78rem;color:var(--dim);margin-bottom:1rem;">These skills appear in the job description but are <strong style="color:var(--text2)">missing</strong> from your resume:</div>
+        <div class="skills-wrap">{% for s in candidate.missing_skills %}<span class="skill skill-miss">✕ {{ s }}</span>{% endfor %}</div>
+        <div class="gap-tip">
+          <div class="gt-lbl">💡 Improvement Tip</div>
+          <div class="gt-txt">Your resume matches <strong>{{ candidate.score_pct }}%</strong> of this role. Adding <strong>{{ candidate.missing_skills|join:", " }}</strong> could significantly boost your score.</div>
+        </div>
+        {% else %}<div class="no-gap">🎉 No major skill gaps detected for this role!</div>{% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const co=document.getElementById('co'),ci=document.getElementById('ci');let mx=-200,my=-200,ox=-200,oy=-200;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;ci.style.left=mx+'px';ci.style.top=my+'px';});
+(function loop(){ox+=(mx-ox)*.12;oy+=(my-oy)*.12;co.style.left=ox+'px';co.style.top=oy+'px';requestAnimationFrame(loop);})();
+document.querySelectorAll('a,button,.skill').forEach(el=>{el.addEventListener('mouseenter',()=>{co.style.width='50px';co.style.height='50px';co.style.borderColor='var(--bio1)';});el.addEventListener('mouseleave',()=>{co.style.width='32px';co.style.height='32px';co.style.borderColor='var(--glow1)';});});
+</script>
+</body>
+</html>

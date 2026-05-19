@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RecruitAI — Command Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cabinet+Grotesk:wght@300;400;500;700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{--ink:#020408;--deep:#050d12;--glow1:#00f5d4;--glow2:#00c9a7;--bio1:#7affde;--amber:#ffb830;--rose:#ff4d7e;--lime:#b8ffb8;--text:#d4f0ec;--text2:#9abfb8;--dim:#4a7a72;--dimmer:#2a4a44;--border:rgba(0,245,212,0.1);--border2:rgba(0,245,212,0.25);--panel:rgba(0,245,212,0.025);--sw:240px;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{height:100%;}
+body{background:var(--ink);color:var(--text);font-family:'Cabinet Grotesk',sans-serif;height:100vh;overflow:hidden;display:flex;cursor:none;}
+
+/* CURSOR */
+.co{position:fixed;width:32px;height:32px;border:1.5px solid var(--glow1);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .25s,height .25s,border-color .25s;mix-blend-mode:screen;}
+.ci{position:fixed;width:5px;height:5px;background:var(--glow1);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);box-shadow:0 0 8px var(--glow1),0 0 16px var(--glow1);}
+
+/* BG */
+.sea-bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 80% 60% at 0% 50%,rgba(0,245,212,.06) 0%,transparent 60%),var(--ink);}
+.bio-orb{position:absolute;border-radius:50%;filter:blur(100px);mix-blend-mode:screen;animation:orb-float ease-in-out infinite;}
+.o1{width:600px;height:600px;background:radial-gradient(circle,rgba(0,245,212,.12) 0%,transparent 70%);top:-200px;left:-100px;animation-duration:25s;}
+.o2{width:400px;height:400px;background:radial-gradient(circle,rgba(122,255,222,.08) 0%,transparent 70%);bottom:-100px;right:200px;animation-duration:30s;animation-delay:-12s;}
+@keyframes orb-float{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(30px,-20px) scale(1.05)}}
+.scanlines{position:fixed;inset:0;z-index:1;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,245,212,.01) 3px,rgba(0,245,212,.01) 4px);}
+.pf{position:fixed;inset:0;z-index:0;pointer-events:none;}
+.p{position:absolute;border-radius:50%;animation:p-rise linear infinite;opacity:0;}
+@keyframes p-rise{0%{transform:translateY(0) translateX(0);opacity:0}10%{opacity:.7}90%{opacity:.1}100%{transform:translateY(-110vh) translateX(var(--d));opacity:0}}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sw);min-width:var(--sw);background:rgba(2,4,8,.9);border-right:1px solid var(--border);display:flex;flex-direction:column;position:relative;z-index:10;overflow-y:auto;}
+.sidebar::after{content:'';position:absolute;top:0;right:0;width:1px;height:100%;background:linear-gradient(180deg,transparent,var(--glow1),transparent);opacity:.2;}
+
+.sb-head{padding:1.5rem 1.25rem 1rem;border-bottom:1px solid var(--border);}
+.sb-brand{display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem;}
+.sb-logo{width:36px;height:36px;position:relative;display:flex;align-items:center;justify-content:center;}
+.sb-logo svg{position:absolute;inset:0;animation:hex-spin 10s linear infinite;}
+.sb-glyph{position:relative;z-index:1;font-size:1rem;}
+.sb-name{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.12em;color:var(--glow1);text-shadow:0 0 40px rgba(0,245,212,.7),0 0 80px rgba(0,245,212,.3);}
+.sb-ver{font-size:.6rem;color:var(--dimmer);letter-spacing:.15em;text-transform:uppercase;margin-top:.1rem;}
+@keyframes hex-spin{to{transform:rotate(360deg)}}
+
+.user-chip{display:flex;align-items:center;gap:.75rem;padding:.6rem .9rem;background:rgba(0,245,212,.04);border:1px solid var(--border);}
+.user-av{width:30px;height:30px;background:linear-gradient(135deg,var(--glow1),var(--glow2));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:.9rem;color:var(--ink);flex-shrink:0;}
+.user-name{font-size:.82rem;font-weight:700;}
+.user-role{font-size:.62rem;color:var(--glow1);letter-spacing:.1em;text-transform:uppercase;margin-top:.1rem;}
+
+.sb-nav{padding:1rem .75rem;flex:1;}
+.nav-lbl{font-size:.58rem;font-weight:700;color:var(--dimmer);text-transform:uppercase;letter-spacing:.18em;padding:0 .5rem;margin:1.25rem 0 .5rem;}
+.nav-a{display:flex;align-items:center;gap:.7rem;padding:.6rem .75rem;text-decoration:none;color:var(--dim);font-size:.82rem;font-weight:600;transition:all .2s;margin-bottom:2px;position:relative;letter-spacing:.02em;}
+.nav-a:hover{color:var(--text);background:rgba(0,245,212,.04);}
+.nav-a.active{color:var(--glow1);background:rgba(0,245,212,.06);}
+.nav-a.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:2px;background:var(--glow1);box-shadow:0 0 6px var(--glow1);}
+.nav-icon{width:18px;text-align:center;font-size:.95rem;}
+.nav-badge{margin-left:auto;font-size:.6rem;padding:2px 7px;background:rgba(0,245,212,.12);color:var(--glow1);border:1px solid var(--border);}
+
+.sb-jobs{padding:0 .75rem 1rem;}
+.job-link{display:block;padding:.55rem .75rem;text-decoration:none;color:var(--text2);font-size:.78rem;border:1px solid transparent;transition:all .2s;margin-bottom:3px;}
+.job-link:hover{background:rgba(0,245,212,.03);border-color:var(--border);color:var(--text);}
+.job-link.active{background:rgba(0,245,212,.06);border-color:rgba(0,245,212,.2);color:var(--glow1);}
+.job-ln{font-weight:600;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.job-lc{font-size:.65rem;color:var(--dimmer);}
+
+.sb-foot{padding:.9rem .75rem;border-top:1px solid var(--border);}
+.logout-a{display:flex;align-items:center;gap:.6rem;padding:.55rem .75rem;text-decoration:none;color:var(--dimmer);font-size:.8rem;transition:all .2s;}
+.logout-a:hover{color:var(--rose);background:rgba(255,77,126,.04);}
+
+/* ── MAIN ── */
+.main{flex:1;overflow-y:auto;position:relative;z-index:5;display:flex;flex-direction:column;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--dimmer);}
+
+.topbar{position:sticky;top:0;z-index:20;background:rgba(2,4,8,.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:.85rem 2rem;display:flex;align-items:center;gap:1rem;}
+.tb-title{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.06em;color:#fff;}
+.tb-sub{font-size:.78rem;color:var(--dim);margin-left:.4rem;}
+.tb-right{margin-left:auto;display:flex;gap:.6rem;}
+
+.btn{padding:.45rem 1rem;font-size:.78rem;font-weight:700;cursor:none;border:1px solid var(--border);text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;color:var(--dim);background:transparent;transition:all .25s;font-family:'Cabinet Grotesk',sans-serif;letter-spacing:.05em;white-space:nowrap;}
+.btn:hover{color:var(--text);border-color:var(--border2);}
+.btn-glow{border-color:var(--border2);color:var(--glow1);background:rgba(0,245,212,.04);}
+.btn-glow:hover{background:rgba(0,245,212,.1);box-shadow:0 0 20px rgba(0,245,212,.2);}
+.btn-primary{background:var(--glow1);color:var(--ink) !important;border-color:var(--glow1);font-weight:800;}
+.btn-primary:hover{box-shadow:0 0 25px rgba(0,245,212,.5);background:var(--bio1);}
+.btn-sm{padding:.3rem .7rem;font-size:.72rem;}
+.btn-danger{border-color:rgba(255,77,126,.3);color:var(--rose);background:transparent;}
+.btn-danger:hover{background:rgba(255,77,126,.08);}
+
+.content{padding:1.75rem 2rem;flex:1;}
+
+/* Stats */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:2rem;}
+.stat-card{background:var(--ink);padding:1.5rem;position:relative;overflow:hidden;transition:background .3s;}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--acc,var(--glow1));opacity:.6;}
+.stat-card:hover{background:rgba(0,245,212,.02);}
+.stat-glow{position:absolute;top:-40px;right:-40px;width:100px;height:100px;border-radius:50%;filter:blur(30px);background:var(--acc,var(--glow1));opacity:.06;}
+.stat-lbl{font-size:.6rem;font-weight:700;color:var(--dimmer);letter-spacing:.18em;text-transform:uppercase;margin-bottom:.6rem;}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:3.2rem;color:#fff;line-height:1;text-shadow:0 0 30px rgba(0,245,212,.4),0 0 60px rgba(0,245,212,.2);}
+.stat-sub{font-size:.72rem;color:var(--dim);margin-top:.3rem;}
+
+/* Content grid */
+.grid{display:grid;grid-template-columns:1fr 300px;gap:1.5rem;}
+
+/* Panel */
+.panel{background:rgba(0,245,212,.02);border:1px solid var(--border);position:relative;overflow:hidden;}
+.panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,245,212,.4),transparent);}
+.ph{padding:.9rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.6rem;}
+.ph-dot{width:6px;height:6px;border-radius:50%;background:var(--glow1);box-shadow:0 0 6px var(--glow1);}
+.ph-title{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.08em;color:#fff;}
+.ph-right{margin-left:auto;display:flex;gap:.5rem;}
+
+/* Table */
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+th{padding:.65rem 1rem;text-align:left;font-size:.58rem;font-weight:700;color:var(--dimmer);text-transform:uppercase;letter-spacing:.15em;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:.75rem 1rem;border-bottom:1px solid rgba(0,245,212,.04);font-size:.82rem;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(0,245,212,.02);}
+
+.rank-medal{font-size:1rem;}
+.rank-num{font-family:'Bebas Neue',sans-serif;font-size:.9rem;color:var(--dimmer);}
+.cname{font-weight:700;color:var(--text);}
+.cemail{font-size:.68rem;color:var(--dimmer);margin-top:1px;}
+
+.score-pill{display:inline-flex;align-items:center;padding:.25rem .7rem;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.08em;border:1px solid;}
+.sp-high{background:rgba(122,255,222,.08);color:var(--bio1);border-color:rgba(122,255,222,.25);}
+.sp-mid{background:rgba(0,245,212,.08);color:var(--glow1);border-color:rgba(0,245,212,.25);}
+.sp-low{background:rgba(255,77,126,.08);color:var(--rose);border-color:rgba(255,77,126,.25);}
+
+.skill-tag{display:inline-flex;padding:2px 7px;font-size:.65rem;margin:2px;background:rgba(0,245,212,.05);color:var(--glow2);border:1px solid rgba(0,245,212,.12);}
+
+.stat-badge{display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .6rem;font-size:.68rem;font-weight:700;letter-spacing:.05em;}
+.sb-dot{width:4px;height:4px;border-radius:50%;}
+.s-pending{background:rgba(255,184,48,.08);color:var(--amber);}
+.s-pending .sb-dot{background:var(--amber);}
+.s-review{background:rgba(0,245,212,.08);color:var(--glow1);}
+.s-review .sb-dot{background:var(--glow1);}
+.s-shortlisted{background:rgba(184,255,184,.08);color:var(--lime);}
+.s-shortlisted .sb-dot{background:var(--lime);box-shadow:0 0 4px var(--lime);}
+.s-rejected{background:rgba(255,77,126,.08);color:var(--rose);}
+.s-rejected .sb-dot{background:var(--rose);}
+
+.stat-sel{background:transparent;border:none;color:inherit;font-size:.68rem;font-weight:700;cursor:none;outline:none;font-family:'Cabinet Grotesk',sans-serif;letter-spacing:.05em;}
+.stat-sel option{background:#050d12;color:var(--text);}
+
+/* Right panels */
+.upload-panel{background:rgba(0,245,212,.02);border:1px solid var(--border);position:relative;overflow:hidden;}
+.upload-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,245,212,.4),transparent);}
+.ff{margin-bottom:.85rem;padding:0 1.25rem;}
+.ff label{font-size:.58rem;font-weight:700;color:var(--dimmer);text-transform:uppercase;letter-spacing:.15em;display:block;margin-bottom:.4rem;}
+.ff input,.ff select{width:100%;background:rgba(0,245,212,.03);border:1px solid var(--border);padding:.6rem .85rem;color:var(--text);font-family:'Cabinet Grotesk',sans-serif;font-size:.82rem;outline:none;transition:all .2s;}
+.ff input:focus,.ff select:focus{border-color:var(--glow2);background:rgba(0,245,212,.05);}
+.ff input::placeholder{color:rgba(74,122,114,.5);}
+.ff select option{background:#050d12;}
+.ff-pt{padding-top:1.25rem;}
+.fa{padding:0 1.25rem 1.25rem;display:flex;flex-direction:column;gap:.5rem;}
+.btn-full{width:100%;justify-content:center;}
+
+.chart-wrap{padding:1.25rem;}
+
+/* Alert */
+.alert-bar{margin:.75rem 2rem;padding:.75rem 1.25rem;background:rgba(122,255,222,.05);border:1px solid rgba(122,255,222,.2);font-size:.82rem;color:var(--bio1);display:flex;align-items:center;gap:.5rem;animation:slide-in .4s ease;}
+@keyframes slide-in{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+
+/* Empty */
+.empty{padding:4rem 2rem;text-align:center;color:var(--dim);}
+.ei{font-size:3rem;opacity:.3;margin-bottom:1rem;}
+
+/* Chatbot */
+.chat-fab{position:fixed;bottom:2rem;right:2rem;z-index:100;width:52px;height:52px;background:var(--glow1);border:none;cursor:none;color:var(--ink);font-size:1.3rem;transition:all .3s;display:flex;align-items:center;justify-content:center;box-shadow:0 0 30px rgba(0,245,212,.5);}
+.chat-fab:hover{transform:scale(1.1) rotate(-5deg);box-shadow:0 0 50px rgba(0,245,212,.7);}
+.chat-win{position:fixed;bottom:6rem;right:2rem;z-index:100;width:360px;height:500px;background:rgba(2,4,8,.95);border:1px solid var(--border);display:none;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.7),0 0 0 1px rgba(0,245,212,.05);animation:chat-pop .3s ease;overflow:hidden;}
+.chat-win.open{display:flex;}
+@keyframes chat-pop{from{opacity:0;transform:scale(.9) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.chat-head{padding:.9rem 1.25rem;background:rgba(0,245,212,.04);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.75rem;}
+.chat-av{width:32px;height:32px;background:var(--glow1);display:flex;align-items:center;justify-content:center;font-size:1rem;}
+.chat-title{font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:.08em;color:#fff;}
+.chat-status{font-size:.62rem;color:var(--glow1);}
+.chat-x{margin-left:auto;background:none;border:none;color:var(--dim);cursor:none;font-size:1rem;transition:color .2s;}
+.chat-x:hover{color:var(--rose);}
+.chat-msgs{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.75rem;}
+.msg{max-width:82%;padding:.6rem .9rem;font-size:.82rem;line-height:1.55;animation:msg-in .25s ease;}
+@keyframes msg-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg-user{background:rgba(0,245,212,.15);color:var(--bio1);align-self:flex-end;border:1px solid rgba(0,245,212,.2);}
+.msg-bot{background:rgba(255,255,255,.04);color:var(--text);align-self:flex-start;border:1px solid var(--border);white-space:pre-wrap;}
+.chat-suggs{display:flex;flex-wrap:wrap;gap:.4rem;padding:0 1rem .75rem;}
+.sugg{font-size:.68rem;padding:.28rem .65rem;background:rgba(0,245,212,.04);border:1px solid var(--border);color:var(--dim);cursor:none;transition:all .2s;}
+.sugg:hover{background:rgba(0,245,212,.1);color:var(--glow1);border-color:var(--border2);}
+.chat-row{padding:.65rem 1rem;border-top:1px solid var(--border);display:flex;gap:.5rem;}
+.chat-in{flex:1;background:rgba(0,245,212,.03);border:1px solid var(--border);padding:.55rem .85rem;color:var(--text);font-family:'Cabinet Grotesk',sans-serif;font-size:.82rem;outline:none;transition:border-color .2s;}
+.chat-in:focus{border-color:var(--glow2);}
+.chat-send{background:var(--glow1);border:none;color:var(--ink);padding:.55rem 1rem;cursor:none;font-size:.85rem;font-weight:800;transition:all .2s;}
+.chat-send:hover{background:var(--bio1);}
+.typing{display:flex;gap:4px;align-items:center;padding:.55rem .9rem;}
+.typing span{width:5px;height:5px;border-radius:50%;background:var(--dim);animation:bounce 1.4s ease-in-out infinite;}
+.typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+</style>
+</head>
+<body>
+<div class="co" id="co"></div><div class="ci" id="ci"></div>
+<div class="sea-bg"><div class="bio-orb o1"></div><div class="bio-orb o2"></div></div>
+<div class="scanlines"></div>
+<div class="pf" id="pf"></div>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="sb-head">
+    <div class="sb-brand">
+      <div class="sb-logo">
+        <svg width="36" height="36" viewBox="0 0 36 36"><polygon points="18,2 33,10 33,26 18,34 3,26 3,10" fill="none" stroke="rgba(0,245,212,0.5)" stroke-width="1"/><polygon points="18,7 29,14 29,22 18,29 7,22 7,14" fill="none" stroke="rgba(0,245,212,0.2)" stroke-width=".5"/></svg>
+        <span class="sb-glyph">⬡</span>
+      </div>
+      <div>
+        <div class="sb-name">RecruitAI</div>
+        <div class="sb-ver">Neural Engine v2</div>
+      </div>
+    </div>
+    <div class="user-chip">
+      <div class="user-av">{{ request.user.username|first|upper }}</div>
+      <div>
+        <div class="user-name">{{ request.user.username }}</div>
+        <div class="user-role">HR Operator</div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="sb-nav">
+    <div class="nav-lbl">Navigation</div>
+    <a href="/dashboard/" class="nav-a active"><span class="nav-icon">⬡</span> Dashboard</a>
+    <a href="/jobs/new/" class="nav-a"><span class="nav-icon">+</span> New Job</a>
+    <a href="/jobs/" class="nav-a"><span class="nav-icon">◫</span> All Jobs {% if total_jobs %}<span class="nav-badge">{{ total_jobs }}</span>{% endif %}</a>
+    {% if jobs %}<div class="nav-lbl" style="margin-top:1.5rem">Active Jobs</div>{% endif %}
+  </nav>
+
+  <div class="sb-jobs">
+    {% for job in jobs %}
+    <a href="/dashboard/?job_id={{ job.id }}" class="job-link {% if active_job.id == job.id %}active{% endif %}">
+      <div class="job-ln">{{ job.title }}</div>
+      <div class="job-lc">{{ job.candidate_count }} candidates</div>
+    </a>
+    {% endfor %}
+  </div>
+
+  <div class="sb-foot">
+    <a href="/logout/" class="logout-a">⎋ Sign Out</a>
+  </div>
+</aside>
+
+<!-- ── MAIN ── -->
+<main class="main">
+  <div class="topbar">
+    <div>
+      <span class="tb-title">{% if active_job %}{{ active_job.title }}{% else %}Command Center{% endif %}</span>
+      {% if active_job %}<span class="tb-sub">{{ candidates|length }} candidates loaded</span>{% endif %}
+    </div>
+    <div class="tb-right">
+      {% if active_job and candidates %}
+      <a href="/jobs/{{ active_job.id }}/screen/" class="btn btn-glow">🧠 Run AI Screening</a>
+      <a href="/jobs/{{ active_job.id }}/report/" class="btn">📄 PDF Report</a>
+      {% endif %}
+      <a href="/jobs/new/" class="btn btn-primary">+ New Job</a>
+    </div>
+  </div>
+
+  {% if messages %}{% for msg in messages %}<div class="alert-bar">✓ {{ msg }}</div>{% endfor %}{% endif %}
+
+  <div class="content">
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card" style="--acc:var(--glow1)"><div class="stat-glow"></div><div class="stat-lbl">Job Postings</div><div class="stat-val">{{ total_jobs }}</div><div class="stat-sub">Active positions</div></div>
+      <div class="stat-card" style="--acc:var(--bio1)"><div class="stat-glow"></div><div class="stat-lbl">Total Resumes</div><div class="stat-val">{{ total_cands }}</div><div class="stat-sub">Across all jobs</div></div>
+      <div class="stat-card" style="--acc:var(--lime)"><div class="stat-glow" style="background:var(--lime)"></div><div class="stat-lbl">Shortlisted</div><div class="stat-val">{{ shortlisted }}</div><div class="stat-sub">Ready to interview</div></div>
+      <div class="stat-card" style="--acc:var(--amber)"><div class="stat-glow" style="background:var(--amber)"></div><div class="stat-lbl">Top Score</div><div class="stat-val">{% if candidates %}{{ candidates.0.score_pct }}%{% else %}—{% endif %}</div><div class="stat-sub">Best match found</div></div>
+    </div>
+
+    {% if active_job %}
+    <div class="grid">
+      <!-- Left: Table + Chart -->
+      <div>
+        <div class="panel" style="margin-bottom:1.5rem;">
+          <div class="ph">
+            <div class="ph-dot"></div>
+            <span class="ph-title">Candidate Rankings</span>
+            <div class="ph-right">
+              {% if not candidates %}<span style="font-size:.72rem;color:var(--dimmer)">Upload resumes →</span>{% endif %}
+            </div>
+          </div>
+          {% if candidates %}
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Rank</th><th>Candidate</th><th>TF-IDF</th><th>BERT</th><th>Score</th><th>Skills</th><th>Status</th><th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for c in candidates %}
+                <tr>
+                  <td>
+                    {% if c.rank == 1 %}<span class="rank-medal">🥇</span>
+                    {% elif c.rank == 2 %}<span class="rank-medal">🥈</span>
+                    {% elif c.rank == 3 %}<span class="rank-medal">🥉</span>
+                    {% elif c.rank > 0 %}<span class="rank-num">#{{ c.rank }}</span>
+                    {% else %}<span class="rank-num">—</span>{% endif %}
+                  </td>
+                  <td>
+                    <div class="cname">{{ c.name }}</div>
+                    {% if c.email %}<div class="cemail">{{ c.email }}</div>{% endif %}
+                  </td>
+                  <td><span style="font-family:'Bebas Neue',sans-serif;font-size:.9rem;color:var(--glow2);">{{ c.tfidf_score|floatformat:1 }}%</span></td>
+                  <td><span style="font-family:'Bebas Neue',sans-serif;font-size:.9rem;color:var(--bio1);">{{ c.bert_pct|floatformat:1 }}%</span></td>
+                  <td>
+                    <span class="score-pill {% if c.score_pct >= 75 %}sp-high{% elif c.score_pct >= 50 %}sp-mid{% else %}sp-low{% endif %}">
+                      {{ c.score_pct }}%
+                    </span>
+                  </td>
+                  <td>
+                    {% for skill in c.skills|slice:":3" %}<span class="skill-tag">{{ skill }}</span>{% endfor %}
+                    {% if c.skills|length > 3 %}<span class="skill-tag" style="color:var(--dimmer)">+{{ c.skills|length|add:"-3" }}</span>{% endif %}
+                  </td>
+                  <td>
+                    <form method="post" action="/resumes/{{ c.pk }}/status/" style="display:inline">
+                      {% csrf_token %}
+                      <div class="stat-badge s-{{ c.status }}">
+                        <span class="sb-dot"></span>
+                        <select name="status" class="stat-sel" onchange="this.form.submit()">
+                          <option value="pending" {% if c.status == 'pending' %}selected{% endif %}>Pending</option>
+                          <option value="review" {% if c.status == 'review' %}selected{% endif %}>Review</option>
+                          <option value="shortlisted" {% if c.status == 'shortlisted' %}selected{% endif %}>Shortlisted</option>
+                          <option value="rejected" {% if c.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                        </select>
+                      </div>
+                    </form>
+                  </td>
+                  <td>
+                    <div style="display:flex;gap:.4rem;">
+                      <a href="/resumes/{{ c.pk }}/" class="btn btn-sm">View</a>
+                      <a href="/resumes/{{ c.pk }}/delete/" class="btn btn-sm btn-danger">✕</a>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="empty"><div class="ei">📭</div><div>No candidates yet — upload via the panel →</div></div>
+          {% endif %}
+        </div>
+
+        {% if candidates %}
+        <div class="panel">
+          <div class="ph"><div class="ph-dot" style="background:var(--amber);box-shadow:0 0 6px var(--amber)"></div><span class="ph-title">Score Distribution</span></div>
+          <div class="chart-wrap"><canvas id="scoreChart" height="80"></canvas></div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Right: Upload + Job Info -->
+      <div style="display:flex;flex-direction:column;gap:1.5rem;">
+        <div class="upload-panel">
+          <div class="ph"><div class="ph-dot"></div><span class="ph-title">Upload Resume</span></div>
+          <form method="post" action="/resumes/upload/" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="job" value="{{ active_job.id }}">
+            <div class="ff ff-pt">
+              <label>Candidate Name</label>
+              <input type="text" name="name" placeholder="Full name" required>
+            </div>
+            <div class="ff">
+              <label>Email</label>
+              <input type="email" name="email" placeholder="email@example.com">
+            </div>
+            <div class="ff">
+              <label>Resume File</label>
+              <input type="file" name="resume_file" accept=".pdf,.docx,.doc,.txt" required>
+            </div>
+            <div class="fa">
+              <button type="submit" class="btn btn-glow btn-full">📤 Upload Resume</button>
+              <a href="/jobs/{{ active_job.id }}/screen/" class="btn btn-primary btn-full">🧠 Run AI Screening</a>
+              <a href="/jobs/{{ active_job.id }}/report/" class="btn btn-full">📄 PDF Report</a>
+            </div>
+          </form>
+        </div>
+
+        <div class="panel">
+          <div class="ph"><div class="ph-dot" style="background:var(--bio1);box-shadow:0 0 6px var(--bio1)"></div><span class="ph-title">Job Details</span><div class="ph-right"><a href="/jobs/{{ active_job.id }}/edit/" class="btn btn-sm">Edit</a></div></div>
+          <div style="padding:1.25rem;">
+            <div style="font-size:.58rem;font-weight:700;color:var(--dimmer);letter-spacing:.18em;text-transform:uppercase;margin-bottom:.3rem;">Title</div>
+            <div style="font-weight:700;font-size:.9rem;margin-bottom:1rem;">{{ active_job.title }}</div>
+            {% if active_job.location %}<div style="font-size:.75rem;color:var(--dim);margin-bottom:.3rem;">📍 {{ active_job.location }}</div>{% endif %}
+            {% if active_job.salary_range %}<div style="font-size:.75rem;color:var(--dim);margin-bottom:.75rem;">💰 {{ active_job.salary_range }}</div>{% endif %}
+            <div style="font-size:.75rem;color:var(--dimmer);line-height:1.65;">{{ active_job.description|truncatewords:40 }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% else %}
+    <div class="panel" style="padding:5rem 2rem;text-align:center;">
+      <div style="font-size:4rem;opacity:.2;margin-bottom:1.5rem;">⬡</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.06em;margin-bottom:.75rem;">SELECT A JOB FROM THE SIDEBAR</div>
+      <div style="color:var(--dim);margin-bottom:2rem;font-size:.85rem;">Or create a new posting to start screening candidates with AI.</div>
+      <a href="/jobs/new/" class="btn btn-primary">+ Create First Job</a>
+    </div>
+    {% endif %}
+  </div>
+</main>
+
+<!-- CHATBOT -->
+<button class="chat-fab" onclick="toggleChat()">🤖</button>
+<div class="chat-win" id="cw">
+  <div class="chat-head">
+    <div class="chat-av">🤖</div>
+    <div><div class="chat-title">Neural Assistant</div><div class="chat-status">● Online · HR Mode</div></div>
+    <button class="chat-x" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="chat-msgs" id="cm"></div>
+  <div class="chat-suggs" id="cs">
+    <span class="sugg" onclick="qa('Who is top candidate?')">Top candidate?</span>
+    <span class="sugg" onclick="qa('Show rankings')">Rankings</span>
+    <span class="sugg" onclick="qa('Average score?')">Avg score</span>
+    <span class="sugg" onclick="qa('How does scoring work?')">Scoring?</span>
+  </div>
+  <div class="chat-row">
+    <input class="chat-in" id="ci2" placeholder="Ask about candidates..." onkeypress="if(event.key==='Enter')send()">
+    <button class="chat-send" onclick="send()">→</button>
+  </div>
+</div>
+
+<script>
+// Chart
+{% if candidates %}
+new Chart(document.getElementById('scoreChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:{{ score_labels|safe }},
+    datasets:[{label:'Final Score',data:{{ score_values|safe }},backgroundColor:'rgba(0,245,212,0.2)',borderColor:'#00f5d4',borderWidth:1.5,borderRadius:4}]
+  },
+  options:{responsive:true,plugins:{legend:{labels:{color:'#4a7a72',font:{size:11}}}},
+    scales:{y:{beginAtZero:true,max:100,ticks:{color:'#4a7a72'},grid:{color:'rgba(0,245,212,0.05)'}},x:{ticks:{color:'#4a7a72'},grid:{display:false}}}}
+});
+{% endif %}
+
+// Cursor
+const co=document.getElementById('co'),ci=document.getElementById('ci');
+let mx=-200,my=-200,ox=-200,oy=-200;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;ci.style.left=mx+'px';ci.style.top=my+'px';});
+(function loop(){ox+=(mx-ox)*.12;oy+=(my-oy)*.12;co.style.left=ox+'px';co.style.top=oy+'px';requestAnimationFrame(loop);})();
+document.querySelectorAll('a,button,input,select').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{co.style.width='50px';co.style.height='50px';co.style.borderColor='var(--bio1)';});
+  el.addEventListener('mouseleave',()=>{co.style.width='32px';co.style.height='32px';co.style.borderColor='var(--glow1)';});
+});
+
+// Particles
+const pf=document.getElementById('pf');
+for(let i=0;i<40;i++){const p=document.createElement('div');p.className='p';const s=1+Math.random()*2;
+  p.style.cssText=`left:${Math.random()*100}%;bottom:-5px;width:${s}px;height:${s}px;--d:${(Math.random()-.5)*60}px;animation-duration:${12+Math.random()*20}s;animation-delay:${-Math.random()*30}s;background:${Math.random()>.7?'var(--amber)':Math.random()>.5?'var(--bio1)':'var(--glow1)'};box-shadow:0 0 ${4+s*2}px currentColor;`;
+  pf.appendChild(p);}
+
+// Chat
+let chatOpen=false;
+const JOB_ID={{ active_job.id|default:"null" }};
+function toggleChat(){chatOpen=!chatOpen;const w=document.getElementById('cw');w.classList.toggle('open',chatOpen);if(chatOpen&&document.getElementById('cm').children.length===0)addMsg('bot','⬡ Neural Assistant online.\n\nAsk me anything about candidates, scores, or how the AI works.');}
+function addMsg(role,text){const c=document.getElementById('cm');const t=c.querySelector('.typing-msg');if(t)t.remove();const d=document.createElement('div');d.className=`msg msg-${role}`;d.textContent=text;c.appendChild(d);c.scrollTop=c.scrollHeight;document.getElementById('cs').style.display='none';}
+function showTyping(){const c=document.getElementById('cm');const d=document.createElement('div');d.className='msg msg-bot typing-msg';d.innerHTML='<div class="typing"><span></span><span></span><span></span></div>';c.appendChild(d);c.scrollTop=c.scrollHeight;}
+async function send(){const inp=document.getElementById('ci2');const m=inp.value.trim();if(!m)return;addMsg('user',m);inp.value='';showTyping();try{const r=await fetch('/api/chat/',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':'{{ csrf_token }}'},body:JSON.stringify({message:m,job_id:JOB_ID,mode:'hr'})});const d=await r.json();addMsg('bot',d.message||'Error.');}catch(e){addMsg('bot','⚠ Connection error.');}}
+function qa(q){document.getElementById('ci2').value=q;send();}
+</script>
+</body>
+</html>

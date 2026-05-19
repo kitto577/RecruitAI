@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RecruitAI — Sign In</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cabinet+Grotesk:wght@300;400;500;700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#020408;--deep:#050d12;--abyss:#030b0f;
+  --glow1:#00f5d4;--glow2:#00c9a7;--glow3:#05f5e3;
+  --bio1:#7affde;--bio2:#00e5c0;
+  --amber:#ffb830;--rose:#ff4d7e;
+  --text:#d4f0ec;--dim:#4a7a72;
+  --panel:rgba(0,245,212,0.03);--border:rgba(0,245,212,0.12);--border2:rgba(0,245,212,0.25);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  background:var(--ink);color:var(--text);
+  font-family:'Cabinet Grotesk',sans-serif;
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;cursor:none;
+}
+
+/* ── CURSOR ── */
+.co{position:fixed;width:36px;height:36px;border:1.5px solid var(--glow1);border-radius:50%;
+  pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .3s,height .3s,border-color .3s,background .3s;mix-blend-mode:screen;}
+.ci{position:fixed;width:6px;height:6px;background:var(--glow1);border-radius:50%;
+  pointer-events:none;z-index:9999;transform:translate(-50%,-50%);
+  box-shadow:0 0 10px var(--glow1),0 0 20px var(--glow1);}
+
+/* ── BACKGROUND ── */
+.sea-bg{position:fixed;inset:0;z-index:0;
+  background:radial-gradient(ellipse 100% 80% at 50% 120%,#001a14 0%,var(--ink) 60%);}
+.bio-orb{position:absolute;border-radius:50%;filter:blur(80px);mix-blend-mode:screen;animation:orb-float ease-in-out infinite;}
+.o1{width:700px;height:700px;background:radial-gradient(circle,rgba(0,245,212,0.15) 0%,transparent 70%);top:-300px;left:-200px;animation-duration:25s;}
+.o2{width:500px;height:500px;background:radial-gradient(circle,rgba(122,255,222,0.1) 0%,transparent 70%);bottom:-200px;right:-100px;animation-duration:30s;animation-delay:-10s;}
+.o3{width:300px;height:300px;background:radial-gradient(circle,rgba(255,184,48,0.06) 0%,transparent 70%);top:40%;left:65%;animation-duration:20s;animation-delay:-5s;}
+@keyframes orb-float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(40px,-30px) scale(1.08)}66%{transform:translate(-25px,40px) scale(.94)}}
+.scanlines{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,245,212,0.012) 3px,rgba(0,245,212,0.012) 4px);}
+.pf{position:fixed;inset:0;z-index:0;pointer-events:none;}
+.p{position:absolute;border-radius:50%;animation:p-rise linear infinite;opacity:0;}
+@keyframes p-rise{0%{transform:translateY(0) translateX(0);opacity:0}10%{opacity:.9}90%{opacity:.2}100%{transform:translateY(-110vh) translateX(var(--d));opacity:0}}
+
+/* ── LAYOUT ── */
+.wrap{position:relative;z-index:10;width:100%;max-width:480px;padding:1.5rem;}
+
+/* ── BRAND ── */
+.brand{text-align:center;margin-bottom:3rem;animation:fade-down .8s ease both;}
+.brand-hex{display:inline-flex;align-items:center;justify-content:center;width:80px;height:80px;position:relative;margin-bottom:1rem;}
+.brand-hex svg{position:absolute;inset:0;animation:hex-spin 8s linear infinite;}
+.brand-glyph{font-size:2rem;position:relative;z-index:1;filter:drop-shadow(0 0 8px var(--glow1));}
+.brand-name{font-family:'Bebas Neue',sans-serif;font-size:4rem;letter-spacing:.12em;color:var(--glow1);
+  text-shadow:0 0 60px rgba(0,245,212,.8),0 0 120px rgba(0,245,212,.5),0 0 200px rgba(0,245,212,.2);display:block;}
+.brand-sub{font-size:.65rem;color:var(--dim);letter-spacing:.25em;text-transform:uppercase;margin-top:.25rem;}
+@keyframes hex-spin{to{transform:rotate(360deg)}}
+
+/* ── FORM PANEL ── */
+.panel{
+  background:rgba(0,245,212,.03);
+  border:1px solid var(--border);
+  position:relative;overflow:hidden;
+  animation:fade-up .8s ease .2s both;
+  padding:2.5rem;
+}
+.panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--glow1),transparent);opacity:.7;}
+.panel::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,245,212,.3),transparent);}
+
+/* Corner brackets */
+.corner{position:absolute;width:16px;height:16px;border-color:var(--glow2);border-style:solid;opacity:.5;}
+.c-tl{top:0;left:0;border-width:1px 0 0 1px;}
+.c-tr{top:0;right:0;border-width:1px 1px 0 0;}
+.c-bl{bottom:0;left:0;border-width:0 0 1px 1px;}
+.c-br{bottom:0;right:0;border-width:0 1px 1px 0;}
+
+.section-tag{font-size:.65rem;font-weight:700;color:var(--glow1);letter-spacing:.2em;
+  text-transform:uppercase;margin-bottom:2rem;display:flex;align-items:center;gap:.75rem;}
+.section-tag::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--glow1),transparent);opacity:.3;}
+
+/* ── FIELDS ── */
+.field{margin-bottom:1.5rem;}
+.field-label{font-size:.62rem;font-weight:700;color:var(--dim);letter-spacing:.18em;
+  text-transform:uppercase;display:block;margin-bottom:.55rem;}
+.field-wrap{position:relative;}
+.field-icon{position:absolute;left:1rem;top:50%;transform:translateY(-50%);
+  color:var(--dim);font-size:.9rem;transition:color .3s;pointer-events:none;}
+input[type="text"],input[type="password"],input[type="email"]{
+  width:100%;background:rgba(0,245,212,.03);border:1px solid var(--border);
+  padding:.85rem 1rem .85rem 2.75rem;color:var(--text);
+  font-family:'Cabinet Grotesk',sans-serif;font-size:.95rem;
+  outline:none;transition:all .3s;
+}
+input:focus{border-color:var(--glow2);background:rgba(0,245,212,.06);
+  box-shadow:0 0 0 3px rgba(0,245,212,.08),0 0 20px rgba(0,245,212,.1);}
+input:focus~.field-icon{color:var(--glow1);}
+input::placeholder{color:rgba(74,122,114,.6);}
+
+/* ── SUBMIT BTN ── */
+.btn-submit{
+  width:100%;padding:1rem;position:relative;overflow:hidden;
+  background:transparent;border:1.5px solid var(--glow1);
+  color:var(--ink);font-family:'Bebas Neue',sans-serif;
+  font-size:1.1rem;letter-spacing:.15em;cursor:none;
+  transition:all .4s;margin-top:.5rem;
+}
+.btn-submit::before{content:'';position:absolute;inset:0;background:var(--glow1);
+  transform:translateY(100%);transition:transform .4s cubic-bezier(.16,1,.3,1);}
+.btn-submit span{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:.6rem;}
+.btn-submit:hover{box-shadow:0 0 40px rgba(0,245,212,.5);}
+.btn-submit:hover::before{transform:translateY(0);}
+
+/* ── ERROR ── */
+.err{padding:.75rem 1rem;border:1px solid rgba(255,77,126,.3);background:rgba(255,77,126,.06);
+  font-size:.82rem;color:#ff8fab;margin-bottom:1.5rem;display:flex;align-items:center;gap:.5rem;}
+
+
+
+
+/* ── REGISTER LINK ── */
+.reg-link{text-align:center;margin-top:1.5rem;padding-top:1.25rem;font-size:.82rem;color:var(--dim);border-top:1px solid var(--border);}
+.reg-link a{color:var(--glow1);text-decoration:none;font-weight:700;transition:text-shadow .3s;}
+.reg-link a:hover{text-shadow:0 0 15px rgba(0,245,212,.6);}
+
+@keyframes fade-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fade-down{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="co" id="co"></div>
+<div class="ci" id="ci"></div>
+
+<div class="sea-bg">
+  <div class="bio-orb o1"></div>
+  <div class="bio-orb o2"></div>
+  <div class="bio-orb o3"></div>
+</div>
+<div class="scanlines"></div>
+<div class="pf" id="pf"></div>
+
+
+<div class="wrap">
+  <div class="brand">
+    <div class="brand-hex">
+      <svg width="64" height="64" viewBox="0 0 64 64">
+        <polygon points="32,3 59,18 59,46 32,61 5,46 5,18" fill="none" stroke="rgba(0,245,212,0.5)" stroke-width="1"/>
+        <polygon points="32,10 53,23 53,41 32,54 11,41 11,23" fill="none" stroke="rgba(0,245,212,0.2)" stroke-width=".5"/>
+      </svg>
+      <span class="brand-glyph">⬡</span>
+    </div>
+    <span class="brand-name">RecruitAI</span>
+    <div class="brand-sub">Neural Hiring Intelligence</div>
+  </div>
+
+  <div class="panel">
+    <div class="corner c-tl"></div><div class="corner c-tr"></div>
+    <div class="corner c-bl"></div><div class="corner c-br"></div>
+
+    <div class="section-tag">Sign In</div>
+
+    {% if messages %}{% for msg in messages %}
+    <div class="err">⚠ {{ msg }}</div>
+    {% endfor %}{% endif %}
+
+    <form method="post" id="lf">
+      {% csrf_token %}
+      <div class="field">
+        <label class="field-label">Username</label>
+        <div class="field-wrap">
+          <span class="field-icon">◈</span>
+          <input type="text" name="username" placeholder="Enter username" required autocomplete="username">
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">Password</label>
+        <div class="field-wrap">
+          <span class="field-icon">◉</span>
+          <input type="password" name="password" placeholder="••••••••••" required autocomplete="current-password">
+        </div>
+      </div>
+      <button type="submit" class="btn-submit">
+        <span>Sign In</span>
+      </button>
+    </form>
+
+    <div class="reg-link">
+      New user? <a href="/register/">Create Account</a>
+    </div>
+    </div>
+  </div>
+
+</div>
+
+
+<script>
+// Cursor
+const co=document.getElementById('co'),ci=document.getElementById('ci');
+let mx=-200,my=-200,ox=-200,oy=-200;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;ci.style.left=mx+'px';ci.style.top=my+'px';});
+(function loop(){ox+=(mx-ox)*.12;oy+=(my-oy)*.12;co.style.left=ox+'px';co.style.top=oy+'px';requestAnimationFrame(loop);})();
+document.querySelectorAll('a,button,input').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{co.style.width='56px';co.style.height='56px';co.style.borderColor='var(--bio1)';});
+  el.addEventListener('mouseleave',()=>{co.style.width='36px';co.style.height='36px';co.style.borderColor='var(--glow1)';});
+});
+// Particles
+const pf=document.getElementById('pf');
+for(let i=0;i<50;i++){const p=document.createElement('div');p.className='p';const s=1+Math.random()*2;
+  p.style.cssText=`left:${Math.random()*100}%;bottom:-5px;width:${s}px;height:${s}px;--d:${(Math.random()-.5)*80}px;animation-duration:${12+Math.random()*18}s;animation-delay:${-Math.random()*30}s;background:${Math.random()>.7?'var(--amber)':Math.random()>.5?'var(--bio1)':'var(--glow1)'};box-shadow:0 0 ${4+s*2}px currentColor;`;
+  pf.appendChild(p);
+}
+// Loading state
+document.getElementById('lf').addEventListener('submit',function(){
+  this.querySelector('.btn-submit span').textContent='Signing in...';
+});
+</script>
+</body>
+</html>
